@@ -1,0 +1,42 @@
+version: '3.8'
+services:
+  db:
+    platform: linux
+    image: postgres:13
+    restart: always
+    container_name: postgres-13
+    environment:
+      - POSTGRES_USERNAME=root
+      - POSTGRES_PASSWORD=root
+      - DATABASE_NAME=strapidb
+      - DATABASE_USERNAME=docker
+      - DATABASE_PASSWORD=docker
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./dbScripts:/docker-entrypoint-initdb.d/
+  strapi:
+    platform: linux
+    container_name: strapi-postgres
+    environment:
+    - NODE_ENV=production
+    - HOST=0.0.0.0
+    - PORT=1337
+    - JWT_SECRET=fade67f0-b951-41b1-b374-a6e3f46b770c
+    - APP_KEYS=aaaaaaa
+    - API_TOKEN_SALT=c91e54e3053c9c3e4dd7c46b521b1ac3
+    - DATABASE_HOST=db
+    - DATABASE_PORT=5432
+    - DATABASE_NAME=strapidb
+    - DATABASE_USERNAME=root
+    - DATABASE_PASSWORD=root
+    - DATABASE_SCHEMA=public
+    - DATABASE_SSL=false
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 1337:1337
+    depends_on:
+      - db
